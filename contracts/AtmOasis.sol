@@ -15,6 +15,8 @@ contract AtmOasis is Ownable, ReentrancyGuard {
   bool public atmActive = false;
   bool public trasuryActive = true;
   bool public burnActive = true;
+  uint public treasuryAmount = 2;
+  uint public burnAmount = 2;
   address manager;
 
   event Received(address from, address to, uint amount, uint date, uint nonce);
@@ -74,15 +76,23 @@ contract AtmOasis is Ownable, ReentrancyGuard {
     burnActive = !burnActive;
   }
 
+  function setTreasuryAmount(uint _treasuryAmount) external onlyOwnerOrManager {
+    treasuryAmount = _treasuryAmount;
+  }
+
+  function setBurnAmount(uint _burnAmount) external onlyOwnerOrManager {
+    burnAmount = _burnAmount;
+  }
+
   function tokenTransfer(uint256 amount) external payable nonReentrant {
     require(atmActive, 'Atm is not currently active');
     require(token.balanceOf(msg.sender) >= amount, 'Insufficent Balance');
     if (trasuryActive) {
-      bool treasury = token.transferFrom(msg.sender, treasuryAddress, amount / 2);
+      bool treasury = token.transferFrom(msg.sender, treasuryAddress, amount / treasuryAmount);
       require(treasury, 'Token transfer from user failed');
     }
     if (burnActive) {
-      bool burn = token.transferFrom(msg.sender, burnAddress, amount / 2);
+      bool burn = token.transferFrom(msg.sender, burnAddress, amount / burnAmount);
       require(burn, 'Token transfer from user failed');
     }
     emit Received(msg.sender, address(this), amount, block.timestamp, nonce);
