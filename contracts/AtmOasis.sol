@@ -7,12 +7,14 @@ import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '../contracts/IToken.sol';
 
 contract AtmOasis is Ownable, ReentrancyGuard {
-  address public treasuryAddress = 0xcFf2045c2a164cbF6c5d01aDd95A5E518E3e8B07;
-  address public burnAddress = 0xcFf2045c2a164cbF6c5d01aDd95A5E518E3e8B07;
+  address public treasuryAddress = 0x5cb954EEcf438bcC958318CDBbD909728Ab86370;
+  address public burnAddress = 0x000000000000000000000000000000000000dEaD;
   mapping(uint256 => bool) public processedNonces;
   uint256 public nonce;
   IToken public token;
-  bool public AtmActive = false;
+  bool public atmActive = false;
+  bool public trasuryActive = true;
+  bool public burnActive = true;
   address manager;
 
   event Received(address from, address to, uint amount, uint date, uint nonce);
@@ -61,16 +63,28 @@ contract AtmOasis is Ownable, ReentrancyGuard {
   }
 
   function setAtmActive() external onlyOwnerOrManager {
-    AtmActive = !AtmActive;
+    atmActive = !atmActive;
+  }
+
+  function setTreasuryActive() external onlyOwnerOrManager {
+    trasuryActive = !trasuryActive;
+  }
+
+  function setBurnActive() external onlyOwnerOrManager {
+    burnActive = !burnActive;
   }
 
   function tokenTransfer(uint256 amount) external payable nonReentrant {
-    require(AtmActive, 'Atm is not currently active');
+    require(atmActive, 'Atm is not currently active');
     require(token.balanceOf(msg.sender) >= amount, 'Insufficent Balance');
-    bool treasury = token.transferFrom(msg.sender, treasuryAddress, amount / 2);
-    require(treasury, 'Token transfer from user failed');
-    bool burn = token.transferFrom(msg.sender, burnAddress, amount / 2);
-    require(burn, 'Token transfer from user failed');
+    if (trasuryActive) {
+      bool treasury = token.transferFrom(msg.sender, treasuryAddress, amount / 2);
+      require(treasury, 'Token transfer from user failed');
+    }
+    if (burnActive) {
+      bool burn = token.transferFrom(msg.sender, burnAddress, amount / 2);
+      require(burn, 'Token transfer from user failed');
+    }
     emit Received(msg.sender, address(this), amount, block.timestamp, nonce);
     nonce++;
   }
