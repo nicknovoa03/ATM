@@ -1,21 +1,15 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
 
-  const lockedAmount = ethers.parseEther("0.001");
+  const oasisToken = '0xF0Dc9fc0669f068e04aD79f7d70618D3f9Aad439'
 
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
+  const AtmOasis = await ethers.deployContract("AtmOasis", [oasisToken]);
 
-  await lock.waitForDeployment();
+  await AtmOasis.waitForDeployment();
 
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    `ATM Oasis deployed to ${AtmOasis}`
   );
 }
 
