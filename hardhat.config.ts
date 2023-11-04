@@ -5,7 +5,7 @@ dotenv.config();
 
 const EthPrivateKey = process.env.ETH_PRIVATE_KEY!
 
-const EthTestPrivateKey = process.env.BSC_TEST_PRIVATE_KEY!
+const EthTestPrivateKey = process.env.ETH_TEST_PRIVATE_KEY!
 
 const EtherscanApiKey = process.env.ETHERSCAN_API_KEY!
 
