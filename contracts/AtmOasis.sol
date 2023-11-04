@@ -9,7 +9,6 @@ import '../contracts/IToken.sol';
 contract AtmOasis is Ownable, ReentrancyGuard {
   address public treasuryAddress = 0x5cb954EEcf438bcC958318CDBbD909728Ab86370;
   address public burnAddress = 0x000000000000000000000000000000000000dEaD;
-  mapping(uint256 => bool) public processedNonces;
   uint256 public nonce;
   IToken public token;
   bool public atmActive = false;
@@ -64,6 +63,14 @@ contract AtmOasis is Ownable, ReentrancyGuard {
     burnAddress = _burnAddress;
   }
 
+  function setTreasuryAmount(uint _treasuryAmount) external onlyOwnerOrManager {
+    treasuryAmount = _treasuryAmount;
+  }
+
+  function setBurnAmount(uint _burnAmount) external onlyOwnerOrManager {
+    burnAmount = _burnAmount;
+  }
+
   function setAtmActive() external onlyOwnerOrManager {
     atmActive = !atmActive;
   }
@@ -74,14 +81,6 @@ contract AtmOasis is Ownable, ReentrancyGuard {
 
   function setBurnActive() external onlyOwnerOrManager {
     burnActive = !burnActive;
-  }
-
-  function setTreasuryAmount(uint _treasuryAmount) external onlyOwnerOrManager {
-    treasuryAmount = _treasuryAmount;
-  }
-
-  function setBurnAmount(uint _burnAmount) external onlyOwnerOrManager {
-    burnAmount = _burnAmount;
   }
 
   function tokenTransfer(uint256 amount) external payable nonReentrant {
